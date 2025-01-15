@@ -1,1 +1,1 @@
-# COMP1004
+# TheCodex -  A self maintained password manager
