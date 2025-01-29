@@ -2,6 +2,10 @@ body{
     background-color: darkslategray;
 }
 
-h1{
+h1,h2{
     color: white;
+}
+
+Content{
+    justify-content: center;
 }

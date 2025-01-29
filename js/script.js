@@ -9,11 +9,16 @@ form.addEventListener("submit", (event) => {
     const file = uploadedFile.files[0];
 
     if (file) {
-        alert(file.type)
 
         // Check if file type is usable
         if (file.type == "application/json" || file.type == "text/csv"){
-            alert("correct file type")
+            const reader = new FileReader();
+
+            reader.onload = (load) => {
+                const fileContents = load.target.result;
+
+                loadText(fileContents);
+            }
 
         } else {
             alert("Please upload either a .CSV or a .JSON")
@@ -21,3 +26,8 @@ form.addEventListener("submit", (event) => {
 
     }
 });
+
+function loadText(file){
+    let headding = document.querySelector("h2");
+    headding.textContent = (file).toString();
+}
