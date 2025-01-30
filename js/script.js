@@ -1,33 +1,18 @@
-// Get the file input and form elements
-const uploadedFile = document.getElementById("uploadedFile");
-const form = document.getElementById("uploadFile");
+document.getElementById('uploadedFile').addEventListener('change', onChange);
 
-// Add an event listener for form submission
-form.addEventListener("submit", (event) => {
-    event.preventDefault();
+function onChange(event) {
+    var reader = new FileReader();
+    reader.onload = readerLoad;
+    reader.readAsText(event.target.files[0]);
+}
 
-    const file = uploadedFile.files[0];
-
-    if (file) {
-
-        // Check if file type is usable
-        if (file.type == "application/json" || file.type == "text/csv"){
-            const reader = new FileReader();
-
-            reader.onload = (load) => {
-                const fileContents = load.target.result;
-
-                loadText(fileContents);
-            }
-
-        } else {
-            alert("Please upload either a .CSV or a .JSON")
-        }
-
-    }
-});
+function readerLoad(event){
+    console.log(event.target.result);
+    var obj = JSON.parse(event.target.result);
+    loadText(obj.username)
+}
 
 function loadText(file){
     let headding = document.querySelector("h2");
-    headding.textContent = (file).toString();
+    headding.textContent = (file);
 }
