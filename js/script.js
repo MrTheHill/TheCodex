@@ -9,10 +9,10 @@ function onChange(event) {
 function readerLoad(event){
     console.log(event.target.result);
     var obj = JSON.parse(event.target.result);
-    loadText(obj)
+    loadText(obj.data)
 }
 
 function loadText(file){
     let heading = document.querySelector("h2");
-    heading.innerHTML = `<pre>${JSON.stringify(file, null, 2)}</pre>`;
+    heading.innerHTML = `<pre>${(JSON.stringify(file, null, 2)).replace(/[{},]/g, '')}</pre>`;
 }

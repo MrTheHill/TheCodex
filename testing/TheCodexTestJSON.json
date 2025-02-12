@@ -1,5 +1,15 @@
 {
     "username": "Harvey",
     "password": "Password1",
-    "key": "uhsxoaudbhoahuosbdocujbaciiha"
+    "key": "uhsxoaudbhoahuosbdocujbaciiha",
+    "data":{
+        "discord":{
+            "username": "Harvey",
+            "password": "Discord"
+        },
+        "github":{
+            "username": "Harvey",
+            "password": "Github"
+        }
+    }
 }
