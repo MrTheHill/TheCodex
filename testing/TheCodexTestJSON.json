@@ -1,15 +1,13 @@
 {
-    "username": "Harvey",
-    "password": "Password1",
-    "key": "uhsxoaudbhoahuosbdocujbaciiha",
+    "masterKey": "b&!a5wxXAV95j16ex",
     "data":{
         "discord":{
             "username": "Harvey",
-            "password": "Discord"
+            "password": "l`PL<g>K0y;bwAjJ"
         },
         "github":{
             "username": "Harvey",
-            "password": "Github"
+            "password": ",j}#&H7BhcI@;a?"
         }
     }
 }
