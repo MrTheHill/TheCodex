@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TheCodex</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
@@ -8,12 +10,22 @@
 <body>
     <div class="Content">
         <h1>TheCodex</h1>
-        <input type="file" id="uploadedFile">
+        <form id="uploadData">
+
+            <label for="fileUpload">Upload your Vault:</label>
+            <input type="file" id="fileUpload" accept="application/json">
+
+            <label for="masterPass">Enter your personal key:</label>
+            <input type="password" id="masterPass">
+
+            <button type="submit">Unlock</button>
+        </form>
+        
         
         <h2></h2>
     </div>
-    
-
     <script src="js/script.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js" integrity="sha512-a+SUDuwNzXDvz4XrIcXHuCf089/iJAoN4lmrXJg18XnduKK6YlDHNRalv4yd1N40OKI80tFidF+rqTFKGPoWFQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bcryptjs/2.4.3/bcrypt.min.js" integrity="sha512-DNI/FJdkfyeuPUal7lDkRVg0mFY2n4IZJJYqPbQWLL0COxLi6G6nmf5gr1vW1Bd4wYC09hOvZVsSclfXxUTU/w==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 </body>
 </html>
