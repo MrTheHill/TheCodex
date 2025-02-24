@@ -16,4 +16,4 @@ TheCodex is a tool for users to be able to take their passwords into their own h
 - No back end data storage
 
 # Disclaimer
-TheCodex was made for my 1004 Single Page Application project, it is a proof of concept and not suggested be used for security perposes
+TheCodex was made for my 1004 Single Page Application project, it is a proof of concept and bugs are likely
