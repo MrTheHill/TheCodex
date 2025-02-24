@@ -1,7 +1,10 @@
 # TheCodex -  A self maintained password manager
 TheCodex is a tool for users to be able to take their passwords into their own hands
 
-DISCLAIMER: This project was made for my 1004 Single Page Application, it is a proof of concept and not suppossed to actually be used for security perposes
+# Features
+- JSON importing
+- Master password verification
+- Password Viewing
 
 # Planned Features
 - Import passwords from CSV or JSON
@@ -11,3 +14,6 @@ DISCLAIMER: This project was made for my 1004 Single Page Application, it is a p
 - Password strength testing
 - Export passwords as CSV or JSON
 - No back end data storage
+
+# Disclaimer
+TheCodex was made for my 1004 Single Page Application project, it is a proof of concept and not suggested be used for security perposes
