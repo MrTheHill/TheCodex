@@ -119,3 +119,15 @@ function addPassword(event) {
     loadTable(Object.values(obj.data));
     document.getElementById('addPasswordForm').reset();
 }
+
+// -------------------------------------------- V Exporting to JSON V --------------------------------------------
+
+document.getElementById('saveData').addEventListener('click', exportPasswords);
+
+function exportPasswords(event) {
+    const blob = new Blob([JSON.stringify(obj, null, 2)], { type: "application/json" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = `TheCodex - Vault(${Date().toString().slice(0, 10)}).json`;
+    a.click();
+};
