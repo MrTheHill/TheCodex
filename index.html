@@ -14,15 +14,41 @@
 
             <label for="fileUpload">Upload your Vault:</label>
             <input type="file" id="fileUpload" accept="application/json">
-
+            <br>
             <label for="masterPass">Enter your personal key:</label>
             <input type="password" id="masterPass">
 
             <button type="submit">Unlock</button>
         </form>
-        
-        
-        <h2></h2>
+
+        <br>
+        <table id="passwordTable">
+            <thead>
+                <tr>Service</tr>
+                <tr>Username</tr>
+                <tr>Password</tr>
+            </thead>
+            <tbody>
+
+            </tbody>
+        </table>
+        <br>
+
+        <form id="newInput">
+            <label for="addService">Enter Service:</label>
+            <input type="text" id="addService">
+            <br>
+            <label for="addUser">Enter Username:</label>
+            <input type="text" id="addUser">
+            <br>
+            <label for="addPass">Enter Password:</label>
+            <input type="password" id="addPass">
+            <br>
+            <label for="confirmPass">Confirm Password:</label>
+            <input type="password" id="confirmPass">
+            <br>
+            <button type="submit">Add new</button>
+        </form>
     </div>
     <script src="js/script.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js" integrity="sha512-a+SUDuwNzXDvz4XrIcXHuCf089/iJAoN4lmrXJg18XnduKK6YlDHNRalv4yd1N40OKI80tFidF+rqTFKGPoWFQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>

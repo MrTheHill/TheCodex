@@ -2,7 +2,7 @@ body{
     background-color: darkslategray;
 }
 
-h1,h2{
+h1,h2,tbody,thead,tr{
     color: white;
 }
 

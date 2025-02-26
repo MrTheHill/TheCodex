@@ -27,10 +27,20 @@ function handleUpload(event) {
 }
 
 function readerLoad(event){
-    console.log(event.target.result);
+    
     let obj = JSON.parse(event.target.result);
-    const key = obj.key
-    loadText(obj.data, "h2")
+    const key = obj.master
+    const master = document.getElementById('masterPass').value.trim();
+
+    if (master != key){
+        alert("Password was incorrect");
+        return; 
+    }
+    
+    //loadText(obj.data, "h2");
+    //console.log(event.target.result);
+    const dataArray = Object.values(obj.data); // Convert the object into an array
+    loadTable(dataArray)
 }
 
 function loadText(data, location){ // Loads contents of file onto page
@@ -38,6 +48,20 @@ function loadText(data, location){ // Loads contents of file onto page
     heading.innerHTML = `<pre>${(JSON.stringify(data, null, 2)).replace(/[{},"]/g, '')}</pre>`;
 }
 
+function loadTable(dataArray){
+    const tbody = document.querySelector("#passwordTable tbody");
+    tbody.innerHTML = "";
+
+    dataArray.forEach(entry => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+            <td>${entry.service}</td>
+            <td>${entry.username}</td>
+            <td>${entry.password}</td>
+        `;
+        tbody.appendChild(row);
+    });
+}
 // -------------------------------------------- V Master Password checks  V --------------------------------------------
 
 
@@ -46,8 +70,19 @@ function loadText(data, location){ // Loads contents of file onto page
 
 // -------------------------------------------- V Data encryption & decryption V --------------------------------------------
 
-function encrypt(input, key){
-    return CryptoJS.AES.encrypt(input, key).toString();
+function generateSalt() {
+    return CryptoJS.lib.WordArray.random(16).toString();
+}
+
+function makeKey(masterPassword, salt) {
+    return CryptoJS.PBKDF2(masterPassword, salt, { keySize: 256 / 32 }).toString();
+}
+
+function encrypt(input){
+    let salt = generateSalt();
+    let key = makeKey(master, salt)
+    let encryptedPassword = CryptoJS.AES.encrypt(input, key).toString();
+    return { encryptedPassword, salt }
 }
 
 function decrypt(input, key){
