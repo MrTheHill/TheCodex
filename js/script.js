@@ -1,3 +1,4 @@
+let obj = {}
 // -------------------------------------------- V Loading from JSON V --------------------------------------------
 document.getElementById('uploadData').addEventListener('submit', handleUpload);
 
@@ -28,7 +29,7 @@ function handleUpload(event) {
 
 function readerLoad(event){
     
-    let obj = JSON.parse(event.target.result);
+    obj = JSON.parse(event.target.result);
     const key = obj.master
     const master = document.getElementById('masterPass').value.trim();
 
@@ -39,8 +40,7 @@ function readerLoad(event){
     
     //loadText(obj.data, "h2");
     //console.log(event.target.result);
-    const dataArray = Object.values(obj.data); // Convert the object into an array
-    loadTable(dataArray)
+    loadTable(Object.values(obj.data))
 }
 
 function loadText(data, location){ // Loads contents of file onto page
@@ -62,6 +62,7 @@ function loadTable(dataArray){
         tbody.appendChild(row);
     });
 }
+
 // -------------------------------------------- V Master Password checks  V --------------------------------------------
 
 
@@ -78,14 +79,43 @@ function makeKey(masterPassword, salt) {
     return CryptoJS.PBKDF2(masterPassword, salt, { keySize: 256 / 32 }).toString();
 }
 
-function encrypt(input){
+function encrypt(input) {
     let salt = generateSalt();
     let key = makeKey(master, salt)
     let encryptedPassword = CryptoJS.AES.encrypt(input, key).toString();
     return { encryptedPassword, salt }
 }
 
-function decrypt(input, key){
+function decrypt(input, key) {
     const bytes = CryptoJS.AES.decrypt(input, key);
     return bytes.toString(CryptoJS.enc.Utf8);
+}
+
+// -------------------------------------------- V Adding passwords V --------------------------------------------
+
+document.getElementById('newPassword').addEventListener('submit', addPassword);
+
+function addPassword(event) {
+    event.preventDefault();
+
+    const service = document.getElementById('addService').value.trim();
+    const username = document.getElementById('addUser').value.trim();
+    const password = document.getElementById('addPass').value.trim();
+    const confirm = document.getElementById('confirmPass').value.trim();
+
+    if (!service || !username || !password || !confirm) {
+        alert("Please fill out all fields.");
+        return;
+    }
+
+    if (confirm != password) {
+        alert("Passwords do not match");
+        return;
+    }
+
+    const newId = Object.keys(obj.data).length + 1;
+    obj.data[newId] = { service, username, password, key: "" };
+
+    loadTable(Object.values(obj.data));
+    document.getElementById('addPasswordForm').reset();
 }
