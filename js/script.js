@@ -113,11 +113,22 @@ function addPassword(event) {
         return;
     }
 
-    const newId = Object.keys(obj.data).length + 1;
-    obj.data[newId] = { service, username, password, key: "" };
+    obj.data[getNewID()] = { service, username, password, key: "" };
 
     loadTable(Object.values(obj.data));
-    document.getElementById('addPasswordForm').reset();
+    document.getElementById('newPassword').reset();
+}
+
+function getNewID(){
+    const existingIds = new Set(Object.keys(obj.data).map(Number));
+    let newId = 1;
+
+    while (existingIds.has(newId)) {
+        newId++;
+    }
+
+    return newId;
+
 }
 
 // -------------------------------------------- V Exporting to JSON V --------------------------------------------
@@ -128,6 +139,6 @@ function exportPasswords(event) {
     const blob = new Blob([JSON.stringify(obj, null, 2)], { type: "application/json" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = `TheCodex - Vault(${Date().toString().slice(0, 10)}).json`;
+    a.download = `TheCodex - Vault.json`;
     a.click();
 };
