@@ -49,6 +49,9 @@ function loadText(data, location){ // Loads contents of file onto page
 }
 
 function loadTable(dataArray){
+    // sort the data alphabetically by service
+    dataArray.sort((a, b) => a.service.localeCompare(b.service));
+
     const tbody = document.querySelector("#passwordTable tbody");
     tbody.innerHTML = "";
 
@@ -107,7 +110,7 @@ function addPassword(event) {
         alert("Please fill out all fields.");
         return;
     }
-
+ 
     if (confirm != password) {
         alert("Passwords do not match");
         return;
