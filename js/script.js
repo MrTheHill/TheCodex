@@ -1,4 +1,4 @@
-let obj = {}
+let obj = {} // global
 // -------------------------------------------- V Loading from JSON V --------------------------------------------
 document.getElementById('uploadData').addEventListener('submit', handleUpload);
 
@@ -49,18 +49,20 @@ function loadText(data, location){ // Loads contents of file onto page
 }
 
 function loadTable(dataArray){
-    // sort the data alphabetically by service
+    // sort the data alphabetically by service - looks nice
     dataArray.sort((a, b) => a.service.localeCompare(b.service));
 
+    // selects the table body and clears any current data in case there was already anything saved
     const tbody = document.querySelector("#passwordTable tbody");
     tbody.innerHTML = "";
 
     dataArray.forEach(entry => {
+        const decryptedPassword = decrypt(entry.password);
         const row = document.createElement("tr");
         row.innerHTML = `
             <td>${entry.service}</td>
             <td>${entry.username}</td>
-            <td>${entry.password}</td>
+            <td>${decryptedPassword}</td>
         `;
         tbody.appendChild(row);
     });
@@ -74,31 +76,51 @@ function loadTable(dataArray){
 
 // -------------------------------------------- V Data encryption & decryption V --------------------------------------------
 
-function generateSalt() {
-    return CryptoJS.lib.WordArray.random(16).toString();
+function encrypt(password) {
+    const masterPass = document.getElementById('masterPass').value.trim();
+
+    const salt = CryptoJS.lib.WordArray.random(16);
+    const key = CryptoJS.PBKDF2(masterPass, salt, { keySize: 256 / 32, iterations: 10000 });
+    const iv = CryptoJS.lib.WordArray.random(16);
+
+    const encrypted = CryptoJS.AES.encrypt(password, key, {
+        iv: iv,
+        padding: CryptoJS.pad.Pkcs7,
+        mode: CryptoJS.mode.CBC
+    });
+
+    const combined = salt.concat(iv).concat(encrypted.ciphertext);
+
+    return CryptoJS.enc.Base64.stringify(combined);
 }
 
-function makeKey(masterPassword, salt) {
-    return CryptoJS.PBKDF2(masterPassword, salt, { keySize: 256 / 32 }).toString();
-}
 
-function encrypt(input) {
-    let salt = generateSalt();
-    let key = makeKey(master, salt)
-    let encryptedPassword = CryptoJS.AES.encrypt(input, key).toString();
-    return { encryptedPassword, salt }
-}
+function decrypt(encrypted) {
+    const masterPass = document.getElementById('masterPass').value.trim();
+    const fullCipher = CryptoJS.enc.Base64.parse(encrypted);
 
-function decrypt(input, key) {
-    const bytes = CryptoJS.AES.decrypt(input, key);
-    return bytes.toString(CryptoJS.enc.Utf8);
+    const salt = CryptoJS.lib.WordArray.create(fullCipher.words.slice(0, 4), 16);
+    const iv = CryptoJS.lib.WordArray.create(fullCipher.words.slice(4, 8), 16);
+    const ciphertext = CryptoJS.lib.WordArray.create(fullCipher.words.slice(8));
+
+    const key = CryptoJS.PBKDF2(masterPass, salt, { keySize: 256 / 32, iterations: 10000 });
+
+    const decrypted = CryptoJS.AES.decrypt(
+        { ciphertext: ciphertext },
+        key,
+        { iv: iv, padding: CryptoJS.pad.Pkcs7, mode: CryptoJS.mode.CBC }
+    );
+
+    const decryptedText = decrypted.toString(CryptoJS.enc.Utf8);
+
+    return decryptedText;
 }
 
 // -------------------------------------------- V Adding passwords V --------------------------------------------
 
 document.getElementById('newPassword').addEventListener('submit', addPassword);
 
-function addPassword(event) {
+async function addPassword(event) {  
     event.preventDefault();
 
     const service = document.getElementById('addService').value.trim();
@@ -111,16 +133,19 @@ function addPassword(event) {
         return;
     }
  
-    if (confirm != password) {
+    if (confirm !== password) {
         alert("Passwords do not match");
         return;
     }
 
-    obj.data[getNewID()] = { service, username, password, key: "" };
+    const encryptedPassword = newEncrypt(password);
+
+    obj.data[getNewID()] = { service: service, username: username, password: encryptedPassword };
 
     loadTable(Object.values(obj.data));
     document.getElementById('newPassword').reset();
 }
+
 
 function getNewID(){
     const existingIds = new Set(Object.keys(obj.data).map(Number));
@@ -138,7 +163,7 @@ function getNewID(){
 
 document.getElementById('saveData').addEventListener('click', exportPasswords);
 
-function exportPasswords(event) {
+function exportPasswords() {
     const blob = new Blob([JSON.stringify(obj, null, 2)], { type: "application/json" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
