@@ -8,9 +8,11 @@
 </head>
 
 <body>
-    <div class="Content">
+    <div id="Content">
         <h1>TheCodex</h1>
-        <form id="uploadData">
+
+        <div id="JSONUploadForm">
+            <form id="uploadData">
 
             <label for="fileUpload">Upload your Vault:</label>
             <input type="file" id="fileUpload" accept="application/json">
@@ -20,9 +22,11 @@
 
             <button type="submit">Unlock</button>
         </form>
+        </div>
+        
 
         <br>
-        <button id="saveData">Save JSON</button>
+        <button id="saveData">Export Passwords</button>
         <br><br>
         <table id="passwordTable">
             <thead>
