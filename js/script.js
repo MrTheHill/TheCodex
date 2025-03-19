@@ -33,17 +33,19 @@ function readerLoad(event){
     const key = obj.master
     const master = document.getElementById('masterPass').value.trim();
 
+    // Improve this later lol - not secure
     if (master != key){
         alert("Password was incorrect");
         return; 
     }
     
-    //loadText(obj.data, "h2");
-    //console.log(event.target.result);
+    toggleElement("JSONUploadForm", "hide");
+    alert("Data loaded successfully");
+
     loadTable(Object.values(obj.data))
 }
 
-function loadText(data, location){ // Loads contents of file onto page
+function loadText(data, location){ // Loads contents of file onto page - old code
     let heading = document.querySelector(location);
     heading.innerHTML = `<pre>${(JSON.stringify(data, null, 2)).replace(/[{},"]/g, '')}</pre>`;
 }
@@ -170,3 +172,17 @@ function exportPasswords() {
     a.download = `TheCodex - Vault.json`;
     a.click();
 };
+
+
+// -------------------------------------------- V Styling bits V --------------------------------------------
+
+function toggleElement(ID, value){
+    let element = document.getElementById(ID);
+    if (value == "show") {
+        element.style.display = "block";
+        return
+    } else if (value == "hide") {
+        element.style.display = "none";
+        return
+    }
+}

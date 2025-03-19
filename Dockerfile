@@ -1,5 +1,5 @@
 # Use nginx as the image base
-from nginx:alpine
+FROM nginx:alpine
 
 # Copy files to default HTML directory
 COPY . /usr/share/nginx/html
