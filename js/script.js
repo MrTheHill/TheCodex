@@ -138,7 +138,7 @@ async function addPassword(event) {
         return;
     }
 
-    const encryptedPassword = newEncrypt(password);
+    const encryptedPassword = encrypt(password);
 
     obj.data[getNewID()] = { service: service, username: username, password: encryptedPassword };
 
