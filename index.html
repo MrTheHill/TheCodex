@@ -18,9 +18,11 @@
             <form id="uploadData">
 
             <label for="fileUpload">Upload your Vault:</label>
-            <input type="file" id="fileUpload" accept="application/json">
             <br>
+            <input type="file" id="fileUpload" accept="application/json">
+            <br><br>
             <label for="masterPass">Enter your personal key:</label>
+            <br>
             <input type="password" id="masterPass" value="b&!a5wxXAV95j16ex">
 
             <button type="submit">Unlock</button>
@@ -29,36 +31,59 @@
         </div>
         
 
+        <div id="exportButton">
+            <button id="saveData">Export Passwords</button>
+            <br><br>
+        </div>
         
-        <button id="saveData">Export Passwords</button>
-        <br><br>
-        <table id="passwordTable">
-            <thead>
-                <tr>Service</tr>
-                <tr>Username</tr>
-                <tr>Password</tr>
-            </thead>
-            <tbody>
+        <div id="viewPasswordTable">
+            <table id="passwordTable">
+                <thead>
+                    <th>Service</th>
+                    <th>Username</th>
+                    <th>Password</th>
+                </thead>
+                <tbody>
 
-            </tbody>
-        </table>
-        <br>
+                </tbody>
+            </table>
+            <br>
+        </div>
 
-        <form id="newPassword">
-            <label for="addService">Enter Service:</label>
-            <input type="text" id="addService">
-            <br>
-            <label for="addUser">Enter Username:</label>
-            <input type="text" id="addUser">
-            <br>
-            <label for="addPass">Enter Password:</label>
-            <input type="password" id="addPass">
-            <br>
-            <label for="confirmPass">Confirm Password:</label>
-            <input type="password" id="confirmPass">
-            <br>
-            <button type="submit">Add new</button>
-        </form>
+        <div id="showAddNew">
+            <button id="showAddNewButton">Add New</button>
+            <br><br>
+        </div>
+
+        <div id="addNewPasswordForm">
+            <form id="newPassword">
+                <label for="addService">Enter Service:</label>
+                <input type="text" id="addService">
+                <br>
+                <label for="addUser">Enter Username:</label>
+                <input type="text" id="addUser">
+                <br>
+                <label for="addPass">Enter Password:</label>
+                <input type="password" id="addPass">
+                <br>
+                <label for="confirmPass">Confirm Password:</label>
+                <input type="password" id="confirmPass">
+                <br>
+                <button type="submit">Save</button>
+            </form>            
+        </div>
+
+        <div id="startNewVaultForm">
+            <form id="createNewVault">
+                <label for="createMasterPassword">Create your master password:</label>
+                <input type="text" id="createMasterPassword">
+                <br>
+                <label for="confirmMasterPassword">Confirm your master password:</label>
+                <input type="text" id="confirmMasterPassword">
+                <br>
+            </form>
+        </div>
+
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
     <script src="js/script.js"></script>

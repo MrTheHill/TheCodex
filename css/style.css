@@ -1,11 +1,27 @@
-body{
+body, tbody{
+    color: white;
     background-color: darkslategray;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    
 }
 
-h1,h2,tbody,thead,tr{
-    color: white;
+th,td{
+    border-bottom: 1px solid gray;
+    padding: 15px;
+}
+
+table,thead{
+    width: 60%;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 Content{
     justify-content: center;
+}
+
+#exportButton,#viewPasswordTable,#addNewPasswordForm,#startNewVaultForm,#showAddNew{
+    display: none;
 }

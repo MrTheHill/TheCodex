@@ -38,15 +38,11 @@ function readerLoad(event){
         return; 
     }
     
-    toggleElement("JSONUploadForm", "hide");
+    toggleElements(["JSONUploadForm"], "hide");
+    toggleElements(["exportButton", "viewPasswordTable", "showAddNew"], "show");
     alert("Data loaded successfully");
 
     loadTable(Object.values(obj.data))
-}
-
-function loadText(data, location){ // Loads contents of file onto page - old code
-    let heading = document.querySelector(location);
-    heading.innerHTML = `<pre>${(JSON.stringify(data, null, 2)).replace(/[{},"]/g, '')}</pre>`;
 }
 
 function loadTable(dataArray){
@@ -112,9 +108,7 @@ function decrypt(encrypted) {
         { iv: iv, padding: CryptoJS.pad.Pkcs7, mode: CryptoJS.mode.CBC }
     );
 
-    const decryptedText = decrypted.toString(CryptoJS.enc.Utf8);
-
-    return decryptedText;
+    return decrypted.toString(CryptoJS.enc.Utf8);
 }
 
 // -------------------------------------------- V Adding passwords V --------------------------------------------
@@ -145,6 +139,8 @@ async function addPassword(event) {
 
     loadTable(Object.values(obj.data));
     document.getElementById('newPassword').reset();
+    toggleElements(["showAddNew"], "show");
+    toggleElements(["addNewPasswordForm"], "hide");
 }
 
 function getNewID(){
@@ -173,13 +169,24 @@ function exportPasswords() {
 
 // -------------------------------------------- V Styling bits V --------------------------------------------
 
-function toggleElement(ID, value){
-    let element = document.getElementById(ID);
-    if (value == "show") {
-        element.style.display = "block";
-        return
-    } else if (value == "hide") {
-        element.style.display = "none";
-        return
-    }
+function toggleElements(elements, value){
+    elements.forEach(element => {
+        element = document.getElementById(element);
+        if (value == "show") {
+            element.style.display = "block";
+            return
+        } else if (value == "hide") {
+            element.style.display = "none";
+            return
+        } else {
+            return
+        }
+    });
+}
+
+document.getElementById('showAddNewButton').addEventListener('click', displayAddNewForm);
+
+function displayAddNewForm(){
+    toggleElements(["addNewPasswordForm"], "show");
+    toggleElements(["showAddNew"], "hide");
 }
