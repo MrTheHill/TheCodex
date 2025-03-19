@@ -28,9 +28,24 @@
             <button type="submit">Unlock</button>
             </form>
             <br>
+            <h1>or</h1>
+            <br>
+            <button id="startNewVault">Create a Vault</button>
+        </div>
+
+        <div id="createNewVault">
+            <form id="createNewVaultForm">
+                <label for="masterKey">Create your Key:</label>
+                <input type="password" id="masterKey">
+                <br>
+                <label for="confirmKey">Confirm Key:</label>
+                <input type="password" id="confirmKey">
+                <br>
+                <p>NOTE: This can't be changed later</p>
+                <button type="submit">Create Vault</button>
+            </form>
         </div>
         
-
         <div id="exportButton">
             <button id="saveData">Export Passwords</button>
             <br><br>
@@ -71,17 +86,6 @@
                 <br>
                 <button type="submit">Save</button>
             </form>            
-        </div>
-
-        <div id="startNewVaultForm">
-            <form id="createNewVault">
-                <label for="createMasterPassword">Create your master password:</label>
-                <input type="text" id="createMasterPassword">
-                <br>
-                <label for="confirmMasterPassword">Confirm your master password:</label>
-                <input type="text" id="confirmMasterPassword">
-                <br>
-            </form>
         </div>
 
     </div>

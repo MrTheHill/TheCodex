@@ -66,6 +66,12 @@ function loadTable(dataArray){
     });
 }
 
+document.getElementById('startNewVault').addEventListener('click', startNewVault);
+
+function startNewVault(){
+    toggleElements(["JSONUploadForm"], "hide");
+    toggleElements(["createNewVault"], "show");
+}
 // -------------------------------------------- V Master Password checks  V --------------------------------------------
 
 function masterHash(password){
