@@ -33,8 +33,7 @@ function readerLoad(event){
     const key = obj.master
     const master = document.getElementById('masterPass').value.trim();
 
-    // Improve this later lol - not secure
-    if (master != key){
+    if (masterHash(master) != key){
         alert("Password was incorrect");
         return; 
     }
@@ -58,6 +57,7 @@ function loadTable(dataArray){
     const tbody = document.querySelector("#passwordTable tbody");
     tbody.innerHTML = "";
 
+    // populates the table with the data from the json
     dataArray.forEach(entry => {
         const decryptedPassword = decrypt(entry.password);
         const row = document.createElement("tr");
@@ -72,9 +72,9 @@ function loadTable(dataArray){
 
 // -------------------------------------------- V Master Password checks  V --------------------------------------------
 
-
-
-
+function masterHash(password){
+    return CryptoJS.SHA256(password).toString(CryptoJS.enc.Hex);
+}
 
 // -------------------------------------------- V Data encryption & decryption V --------------------------------------------
 
@@ -95,7 +95,6 @@ function encrypt(password) {
 
     return CryptoJS.enc.Base64.stringify(combined);
 }
-
 
 function decrypt(encrypted) {
     const masterPass = document.getElementById('masterPass').value.trim();
@@ -148,7 +147,6 @@ async function addPassword(event) {
     document.getElementById('newPassword').reset();
 }
 
-
 function getNewID(){
     const existingIds = new Set(Object.keys(obj.data).map(Number));
     let newId = 1;
@@ -158,7 +156,6 @@ function getNewID(){
     }
 
     return newId;
-
 }
 
 // -------------------------------------------- V Exporting to JSON V --------------------------------------------
