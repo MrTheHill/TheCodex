@@ -1,5 +1,7 @@
-let obj = {} // global
+let json = {} // stores the json data globally so it can be accessed by all code
+
 // -------------------------------------------- V Loading from JSON V --------------------------------------------
+
 document.getElementById('uploadData').addEventListener('submit', handleUpload);
 
 function handleUpload(event) {
@@ -29,12 +31,12 @@ function handleUpload(event) {
 
 function readerLoad(event){
     
-    obj = JSON.parse(event.target.result);
-    const key = obj.master
+    json = JSON.parse(event.target.result);
+    const key = json.master
     const master = document.getElementById('masterPass').value.trim();
 
     if (securityManager.masterHash(master) != key){
-        alert("Password was incorrect");
+        alert("Password is incorrect, plaese try again");
         return; 
     }
     
@@ -42,7 +44,7 @@ function readerLoad(event){
     toggleElements(["exportButton", "viewPasswordTable", "showAddNew"], "show");
     alert("Data loaded successfully");
 
-    loadTable(Object.values(obj.data))
+    loadTable(Object.values(json.data))
 }
 
 function loadTable(dataArray){
@@ -66,29 +68,56 @@ function loadTable(dataArray){
     });
 }
 
-document.getElementById('startNewVault').addEventListener('click', startNewVault);
+document.getElementById('startNewVault').addEventListener('click', showNewVaultForm);
 
-function startNewVault(){
+function showNewVaultForm(){
     toggleElements(["JSONUploadForm"], "hide");
     toggleElements(["createNewVault"], "show");
 }
 
+document.getElementById('createNewVaultForm').addEventListener('submit', startNewVault);
+
+function startNewVault(event){
+    event.preventDefault();
+
+    const masterKey = document.getElementById('masterKey').value.trim();
+    const confirmKey = document.getElementById('confirmKey').value.trim();
+
+    if (!masterKey || !confirmKey) {
+        alert("Please enter you key in both fields");
+        return;
+    }
+
+    if (masterKey !== confirmKey) {
+        alert("Passwords do not match");
+        return;
+    }
+
+    json = { master: securityManager.masterHash(masterKey), data: {} };    
+    securityManager.setMasterPass(masterKey);
+
+    toggleElements(["createNewVault"], "hide");
+    toggleElements(["exportButton", "viewPasswordTable", "showAddNew"], "show");
+    alert("Data loaded successfully");
+
+    loadTable(Object.values(json.data))
+}
 // -------------------------------------------- V Master Password checks  V --------------------------------------------
 
 const securityManager = (function() {
     let masterPass = null;
 
+    // set the masterPassword variable to be used by the rest of the functions
     function setMasterPass(password) {
         masterPass = password;
     }
 
+    // hashes the master password to be compared against the hash saved in the JSON
     function masterHash(password){
         return CryptoJS.SHA256(password).toString(CryptoJS.enc.Hex);
     }
 
     function encrypt(password) {
-    
-
         const salt = CryptoJS.lib.WordArray.random(16);
         const key = CryptoJS.PBKDF2(masterPass, salt, { keySize: 256 / 32, iterations: 10000 });
         const iv = CryptoJS.lib.WordArray.random(16);
@@ -129,7 +158,7 @@ const securityManager = (function() {
 
 document.getElementById('newPassword').addEventListener('submit', addPassword);
 
-async function addPassword(event) {  
+function addPassword(event) {  
     event.preventDefault();
 
     const service = document.getElementById('addService').value.trim();
@@ -149,16 +178,17 @@ async function addPassword(event) {
 
     const encryptedPassword = securityManager.encrypt(password);
 
-    obj.data[getNewID()] = { service: service, username: username, password: encryptedPassword };
+    json.data[getNewID()] = { service: service, username: username, password: encryptedPassword };
 
-    loadTable(Object.values(obj.data));
+    loadTable(Object.values(json.data));
     document.getElementById('newPassword').reset();
+
     toggleElements(["showAddNew"], "show");
     toggleElements(["addNewPasswordForm"], "hide");
 }
 
 function getNewID(){
-    const existingIds = new Set(Object.keys(obj.data).map(Number));
+    const existingIds = new Set(Object.keys(json.data).map(Number));
     let newId = 1;
 
     while (existingIds.has(newId)) {
@@ -173,10 +203,11 @@ function getNewID(){
 document.getElementById('saveData').addEventListener('click', exportPasswords);
 
 function exportPasswords() {
-    const blob = new Blob([JSON.stringify(obj, null, 2)], { type: "application/json" });
+    const date = getDate();
+    const blob = new Blob([JSON.stringify(json, null, 2)], { type: "application/json" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = `TheCodex - Vault.json`;
+    a.download = `TheCodex - Vault(${date}).json`;
     a.click();
 };
 
@@ -196,6 +227,22 @@ function toggleElements(elements, value){
             return
         }
     });
+}
+
+function getDate(){ // returns DD-MM-YYYY - used when saving JSON
+    const today = new Date();
+    const year = today.getFullYear();
+    let month = today.getMonth() + 1;
+    let day = today.getDate();
+
+    if (month < 10) {
+        month = '0' + month;
+    }
+    if (day < 10) {
+        day = '0' + day;
+    }
+
+    return `${day}-${month}-${year}`;
 }
 
 document.getElementById('showAddNewButton').addEventListener('click', displayAddNewForm);
