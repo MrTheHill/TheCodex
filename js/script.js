@@ -104,6 +104,8 @@ function logout(){ // purges data and reloads the page, starting from login scre
     location.reload();
 }
 
+// Closures & IIFE: https://www.geeksforgeeks.org/closure-in-javascript/
+// CryptoJS: https://www.misterpki.com/cryptojs/ & https://jsfiddle.net/MrSuS/kwtv6y2d/
 const securityManager = (function() {
     let masterPass = null;
 
@@ -164,9 +166,11 @@ function getNewID(){
     return newId;
 }
 
+// https://stackoverflow.com/questions/25547475/save-to-local-file-from-blob?#tab-top
 function exportPasswords() {
     const date = getDate();
-    const blob = new Blob([JSON.stringify(json, null, 2)], { type: "application/json" });
+    const blob = new Blob([JSON.stringify(json)], { type: "application/json" });
+    
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
     a.download = `TheCodex - Vault(${date}).json`;
@@ -174,6 +178,7 @@ function exportPasswords() {
 
     logout();
 };
+
 
 function getDate(){ // returns DD-MM-YYYY - used when saving JSON
     const today = new Date();
