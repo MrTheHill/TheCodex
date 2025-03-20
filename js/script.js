@@ -61,7 +61,7 @@ function loadTable(data){ // triggered when the password table is shown/refreshe
 
     // populates the table with the data from the json, decrypting passwords as it goes
     data.forEach(entry => {
-        const decryptedPassword = securityManager.decrypt(entry.password);
+        const decryptedPassword = securityManager.decrypt(entry.password, entry.vector);
         const row = document.createElement("tr");
         row.innerHTML = `
             <td>${entry.service}</td>
@@ -116,29 +116,11 @@ const securityManager = (function() {
     }
 
     function encrypt(password) {
-        const salt = CryptoJS.lib.WordArray.random(16);
-        const key = CryptoJS.PBKDF2(masterPass, salt, { keySize: 256 / 32, iterations: 10000 });
-        const vector = CryptoJS.lib.WordArray.random(16);
-    
-        const encrypted = CryptoJS.AES.encrypt(password, key, {iv: vector, padding: CryptoJS.pad.Pkcs7, mode: CryptoJS.mode.CBC});
-    
-        const combined = salt.concat(vector).concat(encrypted.ciphertext);
-    
-        return CryptoJS.enc.Base64.stringify(combined);
+        return CryptoJS.AES.encrypt(password, masterPass).toString();
     }
 
     function decrypt(encrypted) {
-        const fullCipher = CryptoJS.enc.Base64.parse(encrypted);
-    
-        const salt = CryptoJS.lib.WordArray.create(fullCipher.words.slice(0, 4), 16);
-        const vector = CryptoJS.lib.WordArray.create(fullCipher.words.slice(4, 8), 16);
-        const ciphertext = CryptoJS.lib.WordArray.create(fullCipher.words.slice(8));
-    
-        const key = CryptoJS.PBKDF2(masterPass, salt, { keySize: 256 / 32, iterations: 10000 });
-    
-        const decrypted = CryptoJS.AES.decrypt({ciphertext: ciphertext}, key, {iv: vector, padding: CryptoJS.pad.Pkcs7, mode: CryptoJS.mode.CBC});
-    
-        return decrypted.toString(CryptoJS.enc.Utf8);
+        return CryptoJS.AES.decrypt(encrypted, masterPass).toString(CryptoJS.enc.Utf8);
     }
 
     return { setMasterPass, masterHash, encrypt, decrypt };
@@ -162,9 +144,7 @@ function addPassword(event) {
         return;
     }
 
-    const encryptedPassword = securityManager.encrypt(password);
-
-    json.data[getNewID()] = { service: service, username: username, password: encryptedPassword };
+    json.data[getNewID()] = { service: service, username: username, password: securityManager.encrypt(password)};
 
     loadTable(Object.values(json.data));
     document.getElementById('newPassword').reset();
