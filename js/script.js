@@ -6,7 +6,7 @@ function handleUpload(event) {
     event.preventDefault(); // stops form submission
 
     const fileInput = document.getElementById('fileUpload');
-    const masterPass = document.getElementById('masterPass').value.trim();
+    securityManager.setMasterPass(document.getElementById('masterPass').value.trim());
 
     // Checks if all required data is entered
     if (!fileInput.files.length || !masterPass) {
@@ -33,7 +33,7 @@ function readerLoad(event){
     const key = obj.master
     const master = document.getElementById('masterPass').value.trim();
 
-    if (masterHash(master) != key){
+    if (securityManager.masterHash(master) != key){
         alert("Password was incorrect");
         return; 
     }
@@ -55,7 +55,7 @@ function loadTable(dataArray){
 
     // populates the table with the data from the json
     dataArray.forEach(entry => {
-        const decryptedPassword = decrypt(entry.password);
+        const decryptedPassword = securityManager.decrypt(entry.password);
         const row = document.createElement("tr");
         row.innerHTML = `
             <td>${entry.service}</td>
@@ -72,50 +72,58 @@ function startNewVault(){
     toggleElements(["JSONUploadForm"], "hide");
     toggleElements(["createNewVault"], "show");
 }
+
 // -------------------------------------------- V Master Password checks  V --------------------------------------------
 
-function masterHash(password){
-    return CryptoJS.SHA256(password).toString(CryptoJS.enc.Hex);
-}
+const securityManager = (function() {
+    let masterPass = null;
 
-// -------------------------------------------- V Data encryption & decryption V --------------------------------------------
+    function setMasterPass(password) {
+        masterPass = password;
+    }
 
-function encrypt(password) {
-    const masterPass = document.getElementById('masterPass').value.trim();
+    function masterHash(password){
+        return CryptoJS.SHA256(password).toString(CryptoJS.enc.Hex);
+    }
 
-    const salt = CryptoJS.lib.WordArray.random(16);
-    const key = CryptoJS.PBKDF2(masterPass, salt, { keySize: 256 / 32, iterations: 10000 });
-    const iv = CryptoJS.lib.WordArray.random(16);
+    function encrypt(password) {
+    
 
-    const encrypted = CryptoJS.AES.encrypt(password, key, {
-        iv: iv,
-        padding: CryptoJS.pad.Pkcs7,
-        mode: CryptoJS.mode.CBC
-    });
+        const salt = CryptoJS.lib.WordArray.random(16);
+        const key = CryptoJS.PBKDF2(masterPass, salt, { keySize: 256 / 32, iterations: 10000 });
+        const iv = CryptoJS.lib.WordArray.random(16);
+    
+        const encrypted = CryptoJS.AES.encrypt(password, key, {
+            iv: iv,
+            padding: CryptoJS.pad.Pkcs7,
+            mode: CryptoJS.mode.CBC
+        });
+    
+        const combined = salt.concat(iv).concat(encrypted.ciphertext);
+    
+        return CryptoJS.enc.Base64.stringify(combined);
+    }
 
-    const combined = salt.concat(iv).concat(encrypted.ciphertext);
+    function decrypt(encrypted) {
+        const fullCipher = CryptoJS.enc.Base64.parse(encrypted);
+    
+        const salt = CryptoJS.lib.WordArray.create(fullCipher.words.slice(0, 4), 16);
+        const iv = CryptoJS.lib.WordArray.create(fullCipher.words.slice(4, 8), 16);
+        const ciphertext = CryptoJS.lib.WordArray.create(fullCipher.words.slice(8));
+    
+        const key = CryptoJS.PBKDF2(masterPass, salt, { keySize: 256 / 32, iterations: 10000 });
+    
+        const decrypted = CryptoJS.AES.decrypt(
+            { ciphertext: ciphertext },
+            key,
+            { iv: iv, padding: CryptoJS.pad.Pkcs7, mode: CryptoJS.mode.CBC }
+        );
+    
+        return decrypted.toString(CryptoJS.enc.Utf8);
+    }
 
-    return CryptoJS.enc.Base64.stringify(combined);
-}
-
-function decrypt(encrypted) {
-    const masterPass = document.getElementById('masterPass').value.trim();
-    const fullCipher = CryptoJS.enc.Base64.parse(encrypted);
-
-    const salt = CryptoJS.lib.WordArray.create(fullCipher.words.slice(0, 4), 16);
-    const iv = CryptoJS.lib.WordArray.create(fullCipher.words.slice(4, 8), 16);
-    const ciphertext = CryptoJS.lib.WordArray.create(fullCipher.words.slice(8));
-
-    const key = CryptoJS.PBKDF2(masterPass, salt, { keySize: 256 / 32, iterations: 10000 });
-
-    const decrypted = CryptoJS.AES.decrypt(
-        { ciphertext: ciphertext },
-        key,
-        { iv: iv, padding: CryptoJS.pad.Pkcs7, mode: CryptoJS.mode.CBC }
-    );
-
-    return decrypted.toString(CryptoJS.enc.Utf8);
-}
+    return { setMasterPass, masterHash, encrypt, decrypt };
+})();
 
 // -------------------------------------------- V Adding passwords V --------------------------------------------
 
@@ -139,7 +147,7 @@ async function addPassword(event) {
         return;
     }
 
-    const encryptedPassword = encrypt(password);
+    const encryptedPassword = securityManager.encrypt(password);
 
     obj.data[getNewID()] = { service: service, username: username, password: encryptedPassword };
 
