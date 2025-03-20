@@ -1,10 +1,14 @@
 let json = {} // stores the json data globally so it can be accessed by all code
 
-// -------------------------------------------- V Loading from JSON V --------------------------------------------
-
 document.getElementById('uploadData').addEventListener('submit', handleUpload);
+document.getElementById('newPassword').addEventListener('submit', addPassword);
+document.getElementById('createNewVaultForm').addEventListener('submit', startNewVault);
 
-function handleUpload(event) {
+document.getElementById('saveData').addEventListener('click', exportPasswords);
+document.getElementById('showAddNewButton').addEventListener('click', displayAddNewForm);
+document.getElementById('startNewVault').addEventListener('click', displayNewVaultForm);
+
+function handleUpload(event) { // triggered when user uploads the json file
     event.preventDefault(); // stops form submission
 
     const fileInput = document.getElementById('fileUpload');
@@ -47,16 +51,16 @@ function readerLoad(event){
     loadTable(Object.values(json.data))
 }
 
-function loadTable(dataArray){
+function loadTable(data){ // triggered when the password table is shown/refreshed
     // sort the data alphabetically by service - looks nice
-    dataArray.sort((a, b) => a.service.localeCompare(b.service));
+    data.sort((a, b) => a.service.localeCompare(b.service));
 
     // selects the table body and clears any current data in case there was already anything saved
     const tbody = document.querySelector("#passwordTable tbody");
     tbody.innerHTML = "";
 
-    // populates the table with the data from the json
-    dataArray.forEach(entry => {
+    // populates the table with the data from the json, decrypting passwords as it goes
+    data.forEach(entry => {
         const decryptedPassword = securityManager.decrypt(entry.password);
         const row = document.createElement("tr");
         row.innerHTML = `
@@ -67,15 +71,6 @@ function loadTable(dataArray){
         tbody.appendChild(row);
     });
 }
-
-document.getElementById('startNewVault').addEventListener('click', showNewVaultForm);
-
-function showNewVaultForm(){
-    toggleElements(["JSONUploadForm"], "hide");
-    toggleElements(["createNewVault"], "show");
-}
-
-document.getElementById('createNewVaultForm').addEventListener('submit', startNewVault);
 
 function startNewVault(event){
     event.preventDefault();
@@ -98,37 +93,36 @@ function startNewVault(event){
 
     toggleElements(["createNewVault"], "hide");
     toggleElements(["exportButton", "viewPasswordTable", "showAddNew"], "show");
-    alert("Data loaded successfully");
 
     loadTable(Object.values(json.data))
 }
-// -------------------------------------------- V Master Password checks  V --------------------------------------------
+
+function logout(){ // purges data and reloads the page, starting from login screen
+    json = {};
+    securityManager.setMasterPass(null);
+
+    location.reload();
+}
 
 const securityManager = (function() {
     let masterPass = null;
 
-    // set the masterPassword variable to be used by the rest of the functions
-    function setMasterPass(password) {
+    function setMasterPass(password) { // set the masterPassword variable to be used by the rest of the functions
         masterPass = password;
     }
 
-    // hashes the master password to be compared against the hash saved in the JSON
-    function masterHash(password){
+    function masterHash(password){ // hashes the master password to be compared against the hash saved in the JSON
         return CryptoJS.SHA256(password).toString(CryptoJS.enc.Hex);
     }
 
     function encrypt(password) {
         const salt = CryptoJS.lib.WordArray.random(16);
         const key = CryptoJS.PBKDF2(masterPass, salt, { keySize: 256 / 32, iterations: 10000 });
-        const iv = CryptoJS.lib.WordArray.random(16);
+        const vector = CryptoJS.lib.WordArray.random(16);
     
-        const encrypted = CryptoJS.AES.encrypt(password, key, {
-            iv: iv,
-            padding: CryptoJS.pad.Pkcs7,
-            mode: CryptoJS.mode.CBC
-        });
+        const encrypted = CryptoJS.AES.encrypt(password, key, {iv: vector, padding: CryptoJS.pad.Pkcs7, mode: CryptoJS.mode.CBC});
     
-        const combined = salt.concat(iv).concat(encrypted.ciphertext);
+        const combined = salt.concat(vector).concat(encrypted.ciphertext);
     
         return CryptoJS.enc.Base64.stringify(combined);
     }
@@ -137,26 +131,18 @@ const securityManager = (function() {
         const fullCipher = CryptoJS.enc.Base64.parse(encrypted);
     
         const salt = CryptoJS.lib.WordArray.create(fullCipher.words.slice(0, 4), 16);
-        const iv = CryptoJS.lib.WordArray.create(fullCipher.words.slice(4, 8), 16);
+        const vector = CryptoJS.lib.WordArray.create(fullCipher.words.slice(4, 8), 16);
         const ciphertext = CryptoJS.lib.WordArray.create(fullCipher.words.slice(8));
     
         const key = CryptoJS.PBKDF2(masterPass, salt, { keySize: 256 / 32, iterations: 10000 });
     
-        const decrypted = CryptoJS.AES.decrypt(
-            { ciphertext: ciphertext },
-            key,
-            { iv: iv, padding: CryptoJS.pad.Pkcs7, mode: CryptoJS.mode.CBC }
-        );
+        const decrypted = CryptoJS.AES.decrypt({ciphertext: ciphertext}, key, {iv: vector, padding: CryptoJS.pad.Pkcs7, mode: CryptoJS.mode.CBC});
     
         return decrypted.toString(CryptoJS.enc.Utf8);
     }
 
     return { setMasterPass, masterHash, encrypt, decrypt };
 })();
-
-// -------------------------------------------- V Adding passwords V --------------------------------------------
-
-document.getElementById('newPassword').addEventListener('submit', addPassword);
 
 function addPassword(event) {  
     event.preventDefault();
@@ -198,10 +184,6 @@ function getNewID(){
     return newId;
 }
 
-// -------------------------------------------- V Exporting to JSON V --------------------------------------------
-
-document.getElementById('saveData').addEventListener('click', exportPasswords);
-
 function exportPasswords() {
     const date = getDate();
     const blob = new Blob([JSON.stringify(json, null, 2)], { type: "application/json" });
@@ -209,25 +191,9 @@ function exportPasswords() {
     a.href = URL.createObjectURL(blob);
     a.download = `TheCodex - Vault(${date}).json`;
     a.click();
+
+    logout();
 };
-
-
-// -------------------------------------------- V Styling bits V --------------------------------------------
-
-function toggleElements(elements, value){
-    elements.forEach(element => {
-        element = document.getElementById(element);
-        if (value == "show") {
-            element.style.display = "block";
-            return
-        } else if (value == "hide") {
-            element.style.display = "none";
-            return
-        } else {
-            return
-        }
-    });
-}
 
 function getDate(){ // returns DD-MM-YYYY - used when saving JSON
     const today = new Date();
@@ -245,9 +211,27 @@ function getDate(){ // returns DD-MM-YYYY - used when saving JSON
     return `${day}-${month}-${year}`;
 }
 
-document.getElementById('showAddNewButton').addEventListener('click', displayAddNewForm);
+function toggleElements(elements, value){
+    elements.forEach(element => {
+        element = document.getElementById(element);
+        if (value == "show") {
+            element.style.display = "block";
+            return
+        } else if (value == "hide") {
+            element.style.display = "none";
+            return
+        } else {
+            return
+        }
+    });
+}
 
 function displayAddNewForm(){
     toggleElements(["addNewPasswordForm"], "show");
     toggleElements(["showAddNew"], "hide");
+}
+
+function displayNewVaultForm(){
+    toggleElements(["JSONUploadForm"], "hide");
+    toggleElements(["createNewVault"], "show");
 }

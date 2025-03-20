@@ -3,14 +3,13 @@ TheCodex is a tool for users to be able to take their passwords into their own h
 
 # Features
 - JSON importing
-- Storage in encrypted JSON file
+- Storage in JSON file with encryption
 - Master password verification
 - Password Viewing
 - Export passwords as JSON
 - No back end data storage
 
 # Planned Features
-- Easy read password list
 - Secure password generation
 - Password strength testing
 
