@@ -7,6 +7,7 @@ document.getElementById('createNewVaultForm').addEventListener('submit', startNe
 document.getElementById('saveData').addEventListener('click', exportPasswords);
 document.getElementById('showAddNewButton').addEventListener('click', displayAddNewForm);
 document.getElementById('startNewVault').addEventListener('click', displayNewVaultForm);
+document.getElementById('closeAddNewPasswordForm').addEventListener('click', closeAddNewForm);
 
 function handleUpload(event) { // triggered when user uploads the json file
     event.preventDefault(); // stops form submission
@@ -219,4 +220,9 @@ function displayAddNewForm(){
 function displayNewVaultForm(){
     toggleElements(["JSONUploadForm"], "hide");
     toggleElements(["createNewVault"], "show");
+}
+
+function closeAddNewForm(){
+    toggleElements(["addNewPasswordForm"], "hide");
+    toggleElements(["showAddNew"], "show");
 }
