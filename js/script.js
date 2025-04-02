@@ -118,11 +118,11 @@ const securityManager = (function() {
         return CryptoJS.SHA256(password).toString(CryptoJS.enc.Hex);
     }
 
-    function encrypt(password) {
+    function encrypt(password) { // encrypts the password using AES encryption and the master password as the key
         return CryptoJS.AES.encrypt(password, masterPass).toString();
     }
 
-    function decrypt(encrypted) {
+    function decrypt(encrypted) { // decrypts the password using AES decryption and the master password as the key
         return CryptoJS.AES.decrypt(encrypted, masterPass).toString(CryptoJS.enc.Utf8);
     }
 
@@ -180,6 +180,23 @@ function exportPasswords() {
     logout();
 };
 
+// https://openjavascript.info/2022/03/14/random-password-generator-using-javascript/
+function GeneratePassword(length) {
+    length = length || 12; // defaults to 12 if not provided
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+[]{}|;:,.<>?";
+
+    let password = "";
+    const array = new Uint32Array(length);
+    window.crypto.getRandomValues(array);
+
+    for (let i = 0; i < length; i++) {
+        password += chars[array[i] % chars.length];
+    }
+
+    return password;
+}
+
+     
 
 function getDate(){ // returns DD-MM-YYYY - used when saving JSON
     const today = new Date();
@@ -197,17 +214,15 @@ function getDate(){ // returns DD-MM-YYYY - used when saving JSON
     return `${day}-${month}-${year}`;
 }
 
-function toggleElements(elements, value){
+function toggleElements(elements, value){ // toggles the display of elements based on the value passed to it
     elements.forEach(element => {
         element = document.getElementById(element);
         if (value == "show") {
             element.style.display = "block";
-            return
+
         } else if (value == "hide") {
             element.style.display = "none";
-            return
-        } else {
-            return
+
         }
     });
 }
