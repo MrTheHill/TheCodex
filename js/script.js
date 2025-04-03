@@ -217,13 +217,20 @@ function getDate(){ // returns DD-MM-YYYY - used when saving JSON
 function toggleElements(elements, value){ // toggles the display of elements based on the value passed to it
     elements.forEach(element => {
         element = document.getElementById(element);
-        if (value == "show") {
-            element.style.display = "block";
+        if (!element){
+            return
+            
+        } else {
+            if (value == "show") {
+                element.style.display = "block";
 
-        } else if (value == "hide") {
-            element.style.display = "none";
+            } else if (value == "hide") {
+                element.style.display = "none";
 
+            }
         }
+
+        
     });
 }
 

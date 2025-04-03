@@ -8,9 +8,9 @@ TheCodex is a tool for users to be able to take their passwords into their own h
 - Password Viewing
 - Export passwords as JSON
 - No back end data storage
+- Secure password generation
 
 # Planned Features
-- Secure password generation
 - Password strength testing
 
 # Disclaimer
